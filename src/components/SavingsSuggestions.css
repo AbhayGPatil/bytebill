@@ -1,0 +1,56 @@
+/* SavingsSuggestions.css */
+
+.suggestions-container {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-top: 2.5rem;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .suggestions-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #7e22ce; /* Tailwind purple-700 */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .suggestions-title::before {
+    content: "💡";
+    margin-right: 0.5rem;
+  }
+  
+  .suggestion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .suggestion-item {
+    background-color: #e0f2fe; /* Tailwind blue-50 */
+    color: #1e293b; /* Tailwind slate-800 */
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .suggestion-loading,
+  .suggestion-error,
+  .suggestion-empty {
+    color: #64748b; /* Tailwind slate-500 */
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .suggestion-error {
+    color: #dc2626; /* Tailwind red-600 */
+  }
+  
