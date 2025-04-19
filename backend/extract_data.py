@@ -24,14 +24,20 @@ def extract_text_from_file(file_path):
 
     if texts:
         return texts[0].description
-    return ""
+    else:
+        raise ValueError("No text found in the file. OCR failed.")
 
 # 🧠 Use Gemini to intelligently extract fields
 def extract_fields_and_store(file_path):
     # Step 1: OCR
-    text = extract_text_from_file(file_path)
-    if not text:
-        raise ValueError("No text found in the file")
+    try:
+        text = extract_text_from_file(file_path)
+    except ValueError as e:
+        print(f"❌ Error extracting text: {e}")
+        raise e
+
+    if not text.strip():
+        raise ValueError("Extracted text is empty, cannot proceed.")
 
     # Step 2: Prompt Gemini
     model = GenerativeModel("gemini-1.5-flash")
@@ -48,8 +54,12 @@ def extract_fields_and_store(file_path):
     Bill Text:
     {text}
     """
-    result = model.generate_content(prompt)
-    raw_response = result.text.strip()
+    try:
+        result = model.generate_content(prompt)
+        raw_response = result.text.strip()
+    except Exception as e:
+        print(f"❌ Error generating content from Gemini: {e}")
+        raise e
 
     # Step 3: Parse Gemini Response
     try:
@@ -76,22 +86,26 @@ def extract_fields_and_store(file_path):
         amount = 0.0
 
     # Step 5: Insert into BigQuery
-    bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
-    table_id = "bytebill-2222.bytebill_dataset.expenses"
+    try:
+        bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+        table_id = "bytebill-2222.bytebill_dataset.expenses"
 
-    row = {
-        "date": parsed_date,
-        "recipient": recipient,
-        "category": category,
-        "amount": amount,
-        "raw_text": text,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+        row = {
+            "date": parsed_date,
+            "recipient": recipient,
+            "category": category,
+            "amount": amount,
+            "raw_text": text,
+            "timestamp": datetime.utcnow().isoformat()
+        }
 
-    errors = bq_client.insert_rows_json(table_id, [row])
-    if errors:
-        print("❌ BigQuery insertion errors:", errors)
-        raise Exception("Failed to insert into BigQuery")
+        errors = bq_client.insert_rows_json(table_id, [row])
+        if errors:
+            print("❌ BigQuery insertion errors:", errors)
+            raise Exception("Failed to insert into BigQuery")
+    except Exception as e:
+        print(f"❌ Error inserting into BigQuery: {e}")
+        raise e
 
     return {
         "date": parsed_date,
@@ -99,3 +113,4 @@ def extract_fields_and_store(file_path):
         "category": category,
         "amount": amount
     }
+    
